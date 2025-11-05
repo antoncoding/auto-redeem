@@ -6,7 +6,7 @@ import { maxUint256 } from 'viem';
 
 type Address = `0x${string}`;
 
-const INTERVAL_MS = 1000; // Try every 2 seconds
+const INTERVAL_MS = 1000; // Try every 1 second
 
 async function attemptRedeem() {
   try {

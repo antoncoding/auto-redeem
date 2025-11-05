@@ -32,7 +32,7 @@ Update the vault address in `constant.ts`:
 export const VAULT = '0xYourVaultAddress'
 ```
 
-**Example**: For the Avalanche vault at `0xE1A62FDcC6666847d5EA752634E45e134B2F824B`, it's already configured.
+**Example**: For the K3 USDT Earn Vault, use `0xE1A62FDcC6666847d5EA752634E45e134B2F824B`
 
 ### 4. Transfer vault share tokens
 
@@ -43,22 +43,22 @@ Transfer vault share tokens to the address derived from `PRIVATE_KEY` before run
 To use a different network, update `client.ts`:
 
 ```typescript
-import { mainnet, arbitrum, optimism, polygon } from 'viem/chains';
+import { mainnet } from 'viem/chains'; // Import your desired chain
 
-// Change the chain import and update both clients
+// Update both clients with the new chain
 export const publicClient = createPublicClient({
-  chain: mainnet, // Change this
+  chain: mainnet, // Change this to your network
   transport: http(process.env.RPC_URL),
 });
 
 export const walletClient = createWalletClient({
   account,
-  chain: mainnet, // Change this
+  chain: mainnet, // Change this to your network
   transport: http(process.env.RPC_URL),
 });
 ```
 
-Supported networks: `mainnet`, `sepolia`, `goerli`, `arbitrum`, `optimism`, `polygon`, `avalanche`, `bsc`, `base`, and more.
+Any network supported by viem can be used. Check the [viem chains documentation](https://viem.sh/docs/chains/introduction) for available networks.
 
 ## Run
 
@@ -66,6 +66,6 @@ Supported networks: `mainnet`, `sepolia`, `goerli`, `arbitrum`, `optimism`, `pol
 pnpm start
 ```
 
-The script will run continuously, checking every 1.5 seconds for available liquidity and automatically redeeming shares when possible.
+The script will run continuously, checking every 1 second for available liquidity and automatically redeeming shares when possible.
 
 Press `Ctrl+C` to stop the script.
