@@ -1,4 +1,5 @@
-[
+import { Abi } from "viem"
+export const abi: Abi = [
   {
     "inputs": [
       {
