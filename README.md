@@ -24,6 +24,6 @@ OWNER=0xrecipient_address
 pnpm start
 ```
 
-The script will run continuously, checking every 2 seconds for available liquidity and automatically redeeming shares when possible.
+The script will run continuously, checking every 1.5 seconds for available liquidity and automatically redeeming shares when possible.
 
 Press `Ctrl+C` to stop the script.
