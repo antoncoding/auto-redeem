@@ -3,6 +3,7 @@ import { ConfigForm, type Config } from "@/components/ConfigForm"
 import { useAutoRedeem } from "@/hooks/useAutoRedeem"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Github } from "lucide-react"
 
 export function AutoRedeemApp() {
   const [config, setConfig] = useState<Config | null>(null)
@@ -181,6 +182,19 @@ export function AutoRedeemApp() {
           </Card>
         </div>
       )}
+
+      {/* GitHub Link Footer */}
+      <div className="pt-8 pb-4 text-center border-t">
+        <a
+          href="https://github.com/OneSavieLabs/auto-redeem"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Github className="h-4 w-4" />
+          <span>View on GitHub</span>
+        </a>
+      </div>
     </div>
   )
 }
