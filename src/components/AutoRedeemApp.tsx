@@ -7,6 +7,7 @@ import { Github } from "lucide-react"
 
 export function AutoRedeemApp() {
   const [config, setConfig] = useState<Config | null>(null)
+  const [cachedConfig, setCachedConfig] = useState<Partial<Config> | null>(null)
   const { isRunning, balance, maxRedeemable, botAddress, logs, error, start, stop } =
     useAutoRedeem(config)
   const logsContainerRef = useRef<HTMLDivElement>(null)
@@ -16,6 +17,7 @@ export function AutoRedeemApp() {
       stop()
     }
     setConfig(newConfig)
+    setCachedConfig(newConfig)
   }
 
   const handleStart = () => {
@@ -59,7 +61,7 @@ export function AutoRedeemApp() {
       </div>
 
       {!config ? (
-        <ConfigForm onSubmit={handleConfigSubmit} />
+        <ConfigForm onSubmit={handleConfigSubmit} initialConfig={cachedConfig || undefined} />
       ) : (
         <div className="space-y-6">
           {/* Configuration Info Card */}
