@@ -98,7 +98,7 @@ pnpm start
 ```
 
 The CLI will:
-1. **Prompt you to select a rescue mode** (ERC-4626 Vault Redeem, Morpho, etc.)
+1. **Prompt you to select a rescue mode** (ERC-4626 Vault Redeem, Auto Withdraw, etc.)
 2. **Guide you through configuration** for the selected mode
 3. **Display a beautiful status dashboard**
 4. **Show real-time progress** with spinners and colored output
@@ -109,8 +109,8 @@ The CLI will:
 # ERC-4626 Vault Redeem mode
 pnpm start:vault-redeem
 
-# Morpho mode
-pnpm start:morpho
+# Auto Withdraw mode
+pnpm start:auto-withdraw
 ```
 
 ### Advanced CLI Usage
@@ -120,18 +120,18 @@ pnpm start:morpho
 # Vault redeem with all params
 pnpm start --mode vault-redeem --vault 0xYourVault --owner 0xYourAddress --delegate --interval 2000
 
-# Morpho with params
-pnpm start --mode morpho --market-id YOUR_MARKET_ID --owner 0xYourAddress
+# Auto withdraw with params
+pnpm start --mode auto-withdraw --market-id YOUR_MARKET_ID --owner 0xYourAddress
 
 # Skip all interactive prompts
 pnpm start --mode vault-redeem --vault 0xABC... --owner 0xDEF... --no-interactive
 ```
 
 **Available flags:**
-- `-m, --mode <mode>` - Rescue mode: `vault-redeem`, `morpho`
+- `-m, --mode <mode>` - Rescue mode: `vault-redeem`, `auto-withdraw`
 - `-v, --vault <address>` - Vault contract address (vault-redeem mode)
 - `-o, --owner <address>` - Owner address for receiving assets
-- `--market-id <id>` - Market ID (morpho mode)
+- `--market-id <id>` - Market ID (auto-withdraw mode)
 - `-d, --delegate` - Enable delegate mode (vault-redeem mode)
 - `-i, --interval <ms>` - Check interval in milliseconds (default: 1000)
 - `--no-interactive` - Skip interactive prompts
@@ -171,10 +171,8 @@ auto-redeem/
 │   │   │   ├── executor.ts        # Core logic
 │   │   │   ├── abi.ts             # Contract ABI
 │   │   │   └── types.ts           # Mode-specific types
-│   │   └── morpho/                # Morpho market rescue
-│   │       ├── index.ts           # Mode definition
-│   │       ├── executor.ts        # Core logic (TODO)
-│   │       └── types.ts           # Mode-specific types
+│   │   └── auto-withdraw/         # Auto withdraw liquidity
+│   │       └── index.ts           # Mode definition (TODO)
 │   ├── types/                     # Shared TypeScript types
 │   │   └── index.ts
 │   ├── cli.ts                     # Main CLI with mode selection
@@ -195,15 +193,31 @@ To add a new rescue mode:
 
 Example mode structure:
 ```typescript
-// src/modes/your-mode/index.ts
-export const yourMode: ModeDefinition = {
-  id: 'your-mode',
+// 1. Add your mode to ModeId enum in src/modes/types.ts
+export enum ModeId {
+  VaultRedeem = 'vault-redeem',
+  YourMode = 'your-mode',  // Add this
+}
+
+// 2. Add config type
+export type YourModeConfig = {
+  mode: ModeId.YourMode;
+  // your config fields
+  interval: number;
+};
+
+// 3. Create src/modes/your-mode/index.ts
+export const yourMode: Mode = {
+  id: ModeId.YourMode,
   name: 'Your Mode Name',
   description: 'What this mode does',
-  getPrompts: (options) => [/* prompts */],
-  validateConfig: (config) => [/* validation */],
-  run: async (config) => {/* implementation */},
+  run: async (config: ModeConfig) => {
+    // implementation
+  },
 };
+
+// 4. Register in src/modes/index.ts
+// 5. Add prompts to getModeConfig() in src/cli.ts
 ```
 
 ## Changing Networks

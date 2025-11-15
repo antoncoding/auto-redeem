@@ -2,7 +2,6 @@ import ora from 'ora';
 import chalk from 'chalk';
 import { attemptRedeem, getOperatorAddress } from './executor';
 import { ModeId, type Mode, type ModeConfig, type VaultRedeemConfig } from '../types';
-import type { Address } from '../../types';
 
 async function runVaultRedeem(config: VaultRedeemConfig) {
   const { vault, owner, interval, delegate } = config;

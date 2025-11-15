@@ -1,18 +1,12 @@
 import { vaultRedeemMode } from './vault-redeem';
-import { morphoMode } from './morpho';
-import type { ModeRegistry } from './types';
+import { morphoMarketWithdrawMode } from './auto-withdraw';
+import { ModeId, type Mode } from './types';
 
-export const modes: ModeRegistry = {
-  'vault-redeem': vaultRedeemMode,
-  'morpho': morphoMode,
+export const modes: Record<ModeId, Mode> = {
+  [ModeId.VaultRedeem]: vaultRedeemMode,
+  [ModeId.MorphoMarketWithdraw]: morphoMarketWithdrawMode,
 };
 
-export function getModeById(id: string) {
-  return modes[id];
-}
-
-export function getAllModes() {
-  return Object.values(modes);
-}
+export const allModes = Object.values(modes);
 
 export * from './types';

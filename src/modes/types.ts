@@ -2,7 +2,7 @@ import type { Address } from '../types';
 
 export enum ModeId {
   VaultRedeem = 'vault-redeem',
-  AutoWithdraw = 'auto-withdraw',
+  MorphoMarketWithdraw = 'morpho-market-withdraw',
 }
 
 export type VaultRedeemConfig = {
@@ -13,14 +13,14 @@ export type VaultRedeemConfig = {
   interval: number;
 };
 
-export type AutoWithdrawConfig = {
-  mode: ModeId.AutoWithdraw;
+export type MorphoMarketWithdrawConfig = {
+  mode: ModeId.MorphoMarketWithdraw;
   marketId: string;
   owner: Address;
   interval: number;
 };
 
-export type ModeConfig = VaultRedeemConfig | AutoWithdrawConfig;
+export type ModeConfig = VaultRedeemConfig | MorphoMarketWithdrawConfig;
 
 export type Mode = {
   id: ModeId;
