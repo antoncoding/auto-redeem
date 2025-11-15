@@ -86,6 +86,4 @@ This bot continuously monitors for available liquidity and attempts withdrawals 
 ## Documentation
 
 - **[Direct Script Mode Setup](./docs/direct-script-mode.md)** - Advanced configuration with `.env` files
-- **[Architecture](./docs/architecture.md)** - Technical design and project structure
 - **[Adding New Modes](./docs/adding-modes.md)** - Developer guide for extending the bot
-- **[Changing Networks](./docs/networks.md)** - How to use different blockchain networks
