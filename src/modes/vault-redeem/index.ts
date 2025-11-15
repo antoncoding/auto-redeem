@@ -48,9 +48,14 @@ export async function runVaultRedeem(clients: BlockchainClients, config: VaultRe
     if (result.sharesToRedeem > 0n && result.transactionHash) {
       log.success(`💰 Redeemed ${result.sharesToRedeem} shares → ${owner.slice(0, 10)}...`);
       log.info(`   TX: ${result.transactionHash}`);
-      log.status('Monitoring...');
+    }
+
+    if (result.currentBalance > 0n) {
+      log.status(
+        `Monitoring... (balance: ${result.currentBalance}, redeemable: ${result.maxRedeemable})`
+      );
     } else {
-      log.status('Monitoring...');
+      log.status('Monitoring... (no balance)');
     }
   }
 

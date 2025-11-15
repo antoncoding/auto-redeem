@@ -137,6 +137,8 @@ export async function attemptWithdraw(
     // Calculate available liquidity (total supply - total borrow)
     const availableLiquidity = market.totalSupplyAssets - market.totalBorrowAssets;
 
+    console.log("available", availableLiquidity)
+
     // Determine what we can withdraw
     let sharesToWithdraw = 0n;
     let assetsToWithdraw = 0n;

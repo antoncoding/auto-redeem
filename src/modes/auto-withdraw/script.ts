@@ -57,7 +57,7 @@ async function main() {
       });
     });
 
-  program.parse();
+  await program.parseAsync();
 }
 
 main();

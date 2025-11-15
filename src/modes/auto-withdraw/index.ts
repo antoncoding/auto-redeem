@@ -59,9 +59,14 @@ export async function runMorphoMarketWithdraw(
     if (result.assetsToWithdraw > 0n && result.transactionHash) {
       log.success(`💰 Withdrew ${result.assetsToWithdraw} assets → ${owner.slice(0, 10)}...`);
       log.info(`   TX: ${result.transactionHash}`);
-      log.status('Monitoring...');
+    }
+
+    if (result.currentSupplyShares > 0n) {
+      log.status(
+        `Monitoring... (supply: ${result.currentSupplyAssets}, liquidity: ${result.availableLiquidity})`
+      );
     } else {
-      log.status('Monitoring...');
+      log.status('Monitoring... (no supply)');
     }
   }
 
