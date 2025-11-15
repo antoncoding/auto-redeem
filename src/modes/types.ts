@@ -19,6 +19,7 @@ export type MorphoMarketWithdrawConfig = {
   mode: ModeId.MorphoMarketWithdraw;
   marketId: string;
   owner: Address;
+  morphoAddress: Address;
   interval: number;
 };
 

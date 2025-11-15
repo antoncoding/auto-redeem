@@ -2,8 +2,10 @@
 import 'dotenv/config';
 import prompts from 'prompts';
 import chalk from 'chalk';
+import type { Address } from 'viem';
 import { createClients } from './core/client-factory';
 import { modes, allModes, ModeId, type ModeConfig } from './modes';
+import { getMorphoAddress } from './modes/auto-withdraw/config';
 
 async function main() {
   console.log(chalk.bold.cyan('\n🚀 DeFi Rescue Bot - Interactive Mode\n'));
@@ -77,10 +79,28 @@ async function main() {
       interval: modeAnswers.interval ?? 1000,
     };
   } else if (selectedMode === ModeId.MorphoMarketWithdraw) {
+    // Determine Morpho address
+    let morphoAddress: Address;
+    if (modeAnswers.morphoAddress) {
+      morphoAddress = modeAnswers.morphoAddress as Address;
+    } else {
+      const chainId = await clients.publicClient.getChainId();
+      const detectedAddress = getMorphoAddress(chainId);
+      if (!detectedAddress) {
+        console.error(
+          chalk.red(`\n✗ Unknown chain ID: ${chainId}. Cannot auto-detect Morpho address.\n`)
+        );
+        process.exit(1);
+      }
+      morphoAddress = detectedAddress;
+      console.log(chalk.cyan(`Auto-detected Morpho Blue: ${morphoAddress}\n`));
+    }
+
     config = {
       mode: ModeId.MorphoMarketWithdraw,
       marketId: modeAnswers.marketId,
       owner: modeAnswers.owner,
+      morphoAddress,
       interval: modeAnswers.interval ?? 1000,
     };
   } else {
