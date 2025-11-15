@@ -1,5 +1,10 @@
 import type { Address } from 'viem';
 
+export enum PreCheckError {
+  NoEth = 'NO_ETH',
+  NotAuthorized = 'NOT_AUTHORIZED',
+}
+
 export type MarketState = {
   totalSupplyAssets: bigint;
   totalSupplyShares: bigint;
@@ -23,7 +28,6 @@ export type WithdrawResult = {
   currentSupplyAssets: bigint;
   availableLiquidity: bigint;
   transactionHash?: string;
-  error?: string;
 };
 
 export type AttemptWithdrawParams = {
@@ -34,5 +38,5 @@ export type AttemptWithdrawParams = {
 
 export type PreCheckResult = {
   isValid: boolean;
-  error?: string;
+  error?: PreCheckError;
 };

@@ -1,12 +1,13 @@
 import abi from './abi';
 import type { Address } from 'viem';
 import type { BlockchainClients } from '../../core/client-factory';
-import type {
-  WithdrawResult,
-  AttemptWithdrawParams,
-  PreCheckResult,
-  MarketState,
-  Position,
+import {
+  PreCheckError,
+  type WithdrawResult,
+  type AttemptWithdrawParams,
+  type PreCheckResult,
+  type MarketState,
+  type Position,
 } from './types';
 
 /**
@@ -62,12 +63,8 @@ export async function preExecutionCheck(
   try {
     // Check bot has ETH for gas
     const botBalance = await publicClient.getBalance({ address: botAddress });
-
     if (botBalance === 0n) {
-      return {
-        isValid: false,
-        error: 'No ETH for gas.',
-      };
+      return { isValid: false, error: PreCheckError.NoEth };
     }
 
     // Check if bot is authorized by owner to manage positions
@@ -79,18 +76,12 @@ export async function preExecutionCheck(
     })) as boolean;
 
     if (!isAuthorized) {
-      return {
-        isValid: false,
-        error: 'Bot is not authorized by owner. Owner must call setAuthorization first.',
-      };
+      return { isValid: false, error: PreCheckError.NotAuthorized };
     }
 
     return { isValid: true };
-  } catch (error) {
-    return {
-      isValid: false,
-      error: error instanceof Error ? error.message : 'Unknown error during pre-check',
-    };
+  } catch {
+    return { isValid: false };
   }
 }
 
@@ -207,7 +198,7 @@ export async function attemptWithdraw(
       currentSupplyAssets: supplyAssets,
       availableLiquidity: 0n,
     };
-  } catch (error) {
+  } catch {
     return {
       success: false,
       sharesToWithdraw: 0n,
@@ -215,7 +206,6 @@ export async function attemptWithdraw(
       currentSupplyShares: 0n,
       currentSupplyAssets: 0n,
       availableLiquidity: 0n,
-      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

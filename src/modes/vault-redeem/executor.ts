@@ -1,7 +1,7 @@
 import { abi } from './abi';
-import { Address, parseEther } from 'viem';
+import type { Address } from 'viem';
 import type { BlockchainClients } from '../../core/client-factory';
-import type { RedeemResult, AttemptRedeemParams, PreCheckResult } from './types';
+import { PreCheckError, type RedeemResult, type AttemptRedeemParams, type PreCheckResult } from './types';
 
 /**
  * Performs pre-execution checks before starting the redeem loop
@@ -19,37 +19,27 @@ export async function preExecutionCheck(
   try {
     // Check bot has ETH for gas
     const botBalance = await publicClient.getBalance({ address: botAddress });
-    
     if (botBalance === 0n) {
-      return {
-        isValid: false,
-        error: `No ETH for gas.`,
-      };
+      return { isValid: false, error: PreCheckError.NoEth };
     }
 
     // In delegate mode, check if bot has allowance to spend owner's shares
     if (delegate) {
-      const allowance = await publicClient.readContract({
+      const allowance = (await publicClient.readContract({
         address: vault,
         abi: abi,
         functionName: 'allowance',
         args: [owner, botAddress],
-      }) as bigint;
+      })) as bigint;
 
       if (allowance === 0n) {
-        return {
-          isValid: false,
-          error: 'Bot has no allowance to spend owner shares. Owner must approve bot first.',
-        };
+        return { isValid: false, error: PreCheckError.NoApproval };
       }
     }
 
     return { isValid: true };
-  } catch (error) {
-    return {
-      isValid: false,
-      error: error instanceof Error ? error.message : 'Unknown error during pre-check',
-    };
+  } catch {
+    return { isValid: false };
   }
 }
 
@@ -116,13 +106,12 @@ export async function attemptRedeem(
       currentBalance: balance,
       maxRedeemable,
     };
-  } catch (error) {
+  } catch {
     return {
       success: false,
       sharesToRedeem: 0n,
       currentBalance: 0n,
       maxRedeemable: 0n,
-      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

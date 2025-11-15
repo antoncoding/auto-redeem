@@ -1,4 +1,9 @@
-import { Address } from 'viem';
+import type { Address } from 'viem';
+
+export enum PreCheckError {
+  NoEth = 'NO_ETH',
+  NoApproval = 'NO_APPROVAL',
+}
 
 export type RedeemResult = {
   success: boolean;
@@ -6,7 +11,6 @@ export type RedeemResult = {
   currentBalance: bigint;
   maxRedeemable: bigint;
   transactionHash?: string;
-  error?: string;
 };
 
 export type AttemptRedeemParams = {
@@ -17,5 +21,5 @@ export type AttemptRedeemParams = {
 
 export type PreCheckResult = {
   isValid: boolean;
-  error?: string;
+  error?: PreCheckError;
 };
