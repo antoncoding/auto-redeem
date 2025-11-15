@@ -1,4 +1,4 @@
-# DeFi Rescue Bot
+# Auto Redeem
 
 A flexible rescue bot that continuously attempts to withdraw funds from DeFi protocols with limited liquidity.
 
@@ -14,7 +14,7 @@ A flexible rescue bot that continuously attempts to withdraw funds from DeFi pro
 1. Generate a new wallet at [vanity-eth.tk](https://vanity-eth.tk/) or using any wallet generator
 2. Transfer to this bot wallet:
    - The vault shares or positions you want to rescue
-   - A small amount of native token (ETH/AVAX) for gas fees
+   - A small amount of native token (ETH) for gas fees
 3. When running the bot, set your main wallet as the `OWNER` - this is where rescued assets will be sent
 
 This way, even if something goes wrong, only the bot wallet is at risk, not your main funds.
@@ -35,25 +35,29 @@ pnpm start
 
 That's it! The interactive CLI will guide you through everything.
 
+## How It Works
 
-## Usage
+The bot uses an interactive CLI that guides you through the entire setup process:
 
-### Interactive CLI (Recommended)
+1. **Select a rescue mode** - Choose between ERC-4626 Vault Redeem or Morpho Market Withdraw
+2. **Enter credentials** - Provide your bot wallet's private key and RPC URL
+3. **Configure settings** - Set vault/market addresses, recipient address, and monitoring interval
+4. **Automated monitoring** - The bot continuously checks and executes withdrawals when liquidity is available
 
-The easiest way to run the bot:
 
-```bash
-pnpm start
-```
+### Available Rescue Modes
 
-The CLI will guide you through:
-1. Selecting a rescue mode
-2. Entering your credentials
-3. Configuring mode-specific settings
+Learn more about each mode:
+- **[Vault Redeem](./docs/vault-redeem.md)** - Withdraw from ERC-4626 vaults with delegate/non-delegate options
+- **[Morpho Market Withdraw](./docs/morpho-market-withdraw.md)** - Withdraw from Morpho lending markets
+
+**To stop the bot**: Press `Ctrl+C`
+
+## Advanced Usage
 
 ### Direct Script Mode
 
-For advanced users who want quick restarts with saved configuration:
+For power users who want quick restarts with saved configuration:
 
 ```bash
 # Vault Redeem
@@ -63,7 +67,9 @@ pnpm start:vault-redeem --vault 0xYourVault --owner 0xYourAddress
 pnpm start:morpho-market-withdraw --market-id YOUR_MARKET_ID --owner 0xYourAddress
 ```
 
-Requires a `.env` file with `PRIVATE_KEY` and `RPC_URL`. See [docs/direct-script-mode.md](./docs/direct-script-mode.md) for setup.
+Requires a `.env` file with `PRIVATE_KEY` and `RPC_URL`.
+
+See [docs/direct-script-mode.md](./docs/direct-script-mode.md) for complete setup instructions.
 
 ### Legacy Mode
 
@@ -72,16 +78,6 @@ Simple logging output without interactive UI:
 ```bash
 pnpm start:legacy
 ```
-
-**To stop the bot**: Press `Ctrl+C`
-
-## How It Works
-
-This bot continuously monitors for available liquidity and attempts withdrawals when possible.
-
-**Rescue Modes:**
-- **[Vault Redeem](./docs/vault-redeem.md)** - Withdraw from ERC-4626 vaults
-- **[Morpho Market Withdraw](./docs/morpho-market-withdraw.md)** - Withdraw from Morpho lending markets
 
 ## Documentation
 
