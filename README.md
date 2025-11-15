@@ -46,7 +46,7 @@ OWNER=your_main_wallet_address
 
 ### 3. Configure vault address
 
-Open `constant.ts` and update the vault address:
+Open `src/core/constants.ts` and update the vault address:
 
 ```typescript
 export const VAULT = '0xYourVaultAddress'
@@ -55,6 +55,11 @@ export const VAULT = '0xYourVaultAddress'
 **Example**: For the K3 USDT Earn Vault on Avalanche, use:
 ```typescript
 export const VAULT = '0xE1A62FDcC6666847d5EA752634E45e134B2F824B'
+```
+
+**Alternatively**, you can pass the vault address via CLI flag:
+```bash
+pnpm start --vault 0xYourVaultAddress
 ```
 
 ### 4. Get your bot address and transfer tokens
@@ -84,23 +89,87 @@ Operator: 0x66ae9d415DCD4DaD9425B485Bd82D8c2A2F829F9
 
 ## How to Run
 
-Start the bot with:
+### Interactive CLI Mode (Recommended)
+
+Start the bot with the new interactive CLI:
 
 ```bash
 pnpm start
 ```
 
-The script will:
-- Display your bot's wallet address (Operator)
-- Check every 1 second for available liquidity
-- Automatically redeem shares when liquidity is available
-- Send redeemed assets to your main wallet (OWNER address)
+The CLI will:
+- Prompt you for configuration if not provided via flags
+- Display a beautiful status dashboard
+- Show real-time progress with spinners
+- Provide colored output for better visibility
 
-**To stop the bot**: Press `Ctrl+C`
+**CLI Options:**
+```bash
+# Run with interactive prompts (default)
+pnpm start
+
+# Run with CLI flags (skip prompts)
+pnpm start --delegate --interval 2000
+
+# Run with custom vault and owner
+pnpm start --vault 0xYourVault --owner 0xYourAddress
+
+# Skip all interactive prompts
+pnpm start --no-interactive
+
+# Show help
+pnpm start --help
+```
+
+**Available flags:**
+- `-d, --delegate` - Enable delegate mode
+- `-i, --interval <ms>` - Check interval in milliseconds (default: 1000)
+- `-v, --vault <address>` - Vault contract address
+- `-o, --owner <address>` - Owner address for receiving assets
+- `--no-interactive` - Skip interactive prompts
+
+### Legacy Simple Mode
+
+For the original simple script output:
+
+```bash
+pnpm start:legacy
+```
+
+### Original Script (Preserved for Reference)
+
+The original index.ts script is still available:
+
+```bash
+pnpm start:old
+```
+
+**To stop the bot**: Press `Ctrl+C` in any mode
+
+## Project Structure
+
+The project is now organized following CLI tool best practices:
+
+```
+auto-redeem/
+├── src/
+│   ├── core/              # Shared business logic
+│   │   ├── client.ts      # Blockchain clients
+│   │   ├── constants.ts   # Configuration constants
+│   │   ├── abi.ts         # Contract ABI
+│   │   └── redeem.ts      # Core redemption logic
+│   ├── types/             # TypeScript types
+│   │   └── index.ts       # Shared types
+│   ├── cli.ts             # New interactive CLI
+│   └── legacy.ts          # Simple script (original style)
+├── [old files]            # Original files preserved for reference
+├── package.json
+└── README.md
+```
 
 ## Changing Networks
 
-If you want to use a different network, update `client.ts`:
+If you want to use a different network, update `src/core/client.ts`:
 
 ```typescript
 import { mainnet } from 'viem/chains'; // Import your desired chain

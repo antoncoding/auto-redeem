@@ -1,11 +1,14 @@
 {
   "name": "auto-redeem",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Auto-redeem rescue script with CLI interface",
   "main": "index.js",
   "scripts": {
-    "start": "tsx index.ts",
-    "dev": "tsx watch index.ts",
+    "start": "tsx src/cli.ts",
+    "start:legacy": "tsx src/legacy.ts",
+    "start:old": "tsx index.ts",
+    "dev": "tsx watch src/cli.ts",
+    "dev:legacy": "tsx watch src/legacy.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,10 +16,15 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "ora": "^8.1.1",
+    "prompts": "^2.4.2",
     "viem": "^2.38.6"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
+    "@types/prompts": "^2.4.9",
     "dotenv": "^17.2.3",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
