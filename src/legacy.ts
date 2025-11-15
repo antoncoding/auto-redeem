@@ -1,8 +1,8 @@
 import 'dotenv/config';
+import { Address } from 'viem';
 import { createClients } from './core/client-factory';
 import { DEFAULT_VAULT, DEFAULT_OWNER } from './modes/vault-redeem/config';
 import { attemptRedeem } from './modes/vault-redeem/executor';
-import type { Address } from './types';
 
 if (!process.env.PRIVATE_KEY || !process.env.RPC_URL) {
   console.error('\n✗ PRIVATE_KEY and RPC_URL are required in .env file\n');

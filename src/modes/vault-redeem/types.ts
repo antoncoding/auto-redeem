@@ -1,4 +1,4 @@
-import type { Address } from '../../types';
+import { Address } from 'viem';
 
 export type RedeemResult = {
   success: boolean;

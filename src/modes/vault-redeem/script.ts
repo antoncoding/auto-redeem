@@ -1,11 +1,10 @@
-#!/usr/bin/env node
 import 'dotenv/config';
+import { Address } from 'viem';
 import { Command } from 'commander';
 import { createClients } from '../../core/client-factory';
 import { DEFAULT_VAULT, DEFAULT_OWNER } from './config';
 import { runVaultRedeem } from './index';
 import { ModeId } from '../types';
-import type { Address } from '../../types';
 
 const program = new Command();
 

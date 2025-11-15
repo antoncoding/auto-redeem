@@ -1,5 +1,5 @@
 import type prompts from 'prompts';
-import type { Address } from '../types';
+import type { Address } from 'viem';
 import type { BlockchainClients } from '../core/client-factory';
 
 export enum ModeId {

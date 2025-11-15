@@ -1,5 +1,5 @@
 import { abi } from './abi';
-import type { Address } from '../../types';
+import { Address } from 'viem';
 import type { BlockchainClients } from '../../core/client-factory';
 import type { RedeemResult, AttemptRedeemParams } from './types';
 
