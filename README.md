@@ -130,19 +130,17 @@ pnpm start --help
 
 ### Legacy Simple Mode
 
-For the original simple script output:
+For the original simple script output (same functionality, no interactive prompts, simpler logging):
 
 ```bash
 pnpm start:legacy
 ```
 
-### Original Script (Preserved for Reference)
-
-The original index.ts script is still available:
-
-```bash
-pnpm start:old
-```
+The legacy script:
+- Uses the same core redemption logic as the new CLI
+- Displays simple console.log output (no colors or spinners)
+- Reads configuration from `src/core/constants.ts` and `.env`
+- Perfect if you prefer minimal output or are running in environments without terminal color support
 
 **To stop the bot**: Press `Ctrl+C` in any mode
 
@@ -160,9 +158,9 @@ auto-redeem/
 │   │   └── redeem.ts      # Core redemption logic
 │   ├── types/             # TypeScript types
 │   │   └── index.ts       # Shared types
-│   ├── cli.ts             # New interactive CLI
-│   └── legacy.ts          # Simple script (original style)
-├── [old files]            # Original files preserved for reference
+│   ├── cli.ts             # New interactive CLI (pnpm start)
+│   └── legacy.ts          # Simple script (pnpm start:legacy)
+├── .env                   # Environment variables
 ├── package.json
 └── README.md
 ```

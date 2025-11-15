@@ -3,11 +3,13 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { avalanche } from 'viem/chains';
 
 if (!process.env.PRIVATE_KEY) {
-  throw new Error('PRIVATE_KEY is required in .env file');
+  console.error('\n✗ PRIVATE_KEY is required in .env file\n');
+  process.exit(1);
 }
 
 if (!process.env.RPC_URL) {
-  throw new Error('RPC_URL is required in .env file');
+  console.error('\n✗ RPC_URL is required in .env file\n');
+  process.exit(1);
 }
 
 export const account = privateKeyToAccount(`0x${process.env.PRIVATE_KEY.replace('0x', '')}`);

@@ -6,7 +6,6 @@
   "scripts": {
     "start": "tsx src/cli.ts",
     "start:legacy": "tsx src/legacy.ts",
-    "start:old": "tsx index.ts",
     "dev": "tsx watch src/cli.ts",
     "dev:legacy": "tsx watch src/legacy.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
