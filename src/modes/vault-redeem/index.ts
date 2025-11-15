@@ -1,6 +1,6 @@
 import ora from 'ora';
 import chalk from 'chalk';
-import { attemptRedeem, getOperatorAddress } from './executor';
+import { attemptRedeem, getOperatorAddress, preExecutionCheck } from './executor';
 import { getVaultRedeemPrompts } from './prompts';
 import { ModeId, type Mode, type ModeConfig, type VaultRedeemConfig } from '../types';
 import type { BlockchainClients } from '../../core/client-factory';
@@ -17,6 +17,19 @@ export async function runVaultRedeem(clients: BlockchainClients, config: VaultRe
   console.log(chalk.gray('  Delegate:   ') + (delegate ? chalk.green('✓ Enabled') : chalk.dim('✗ Disabled')));
   console.log(chalk.gray('  Interval:   ') + chalk.white(`${interval}ms`));
   console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+
+  // Pre-execution checks
+  const preCheckSpinner = ora(chalk.blue('Running pre-execution checks...')).start();
+  const preCheckResult = await preExecutionCheck(clients, { vault, owner, delegate });
+
+  if (!preCheckResult.isValid) {
+    preCheckSpinner.fail(chalk.red('Pre-execution check failed!'));
+    console.log(chalk.red(`Error: ${preCheckResult.error}`));
+    process.exit(1);
+  }
+
+  preCheckSpinner.succeed(chalk.green('Pre-execution checks passed'));
+  console.log('');
 
   let attemptCount = 0;
   let spinner: ReturnType<typeof ora> | null = null;

@@ -12,3 +12,8 @@ export type AttemptRedeemParams = {
   owner: Address;
   delegate?: boolean;
 };
+
+export type PreCheckResult = {
+  isValid: boolean;
+  error?: string;
+};
