@@ -1,23 +1,35 @@
 import 'dotenv/config';
-import { account } from './core/client';
-import { VAULT, OWNER } from './core/constants';
+import { createClients } from './core/client-factory';
+import { DEFAULT_VAULT, DEFAULT_OWNER } from './modes/vault-redeem/config';
 import { attemptRedeem } from './modes/vault-redeem/executor';
 import type { Address } from './types';
+
+if (!process.env.PRIVATE_KEY || !process.env.RPC_URL) {
+  console.error('\n✗ PRIVATE_KEY and RPC_URL are required in .env file\n');
+  process.exit(1);
+}
+
+if (!DEFAULT_OWNER) {
+  console.error('\n✗ OWNER is required in .env file or set DEFAULT_OWNER in vault-redeem/config.ts\n');
+  process.exit(1);
+}
+
+const clients = createClients(process.env.PRIVATE_KEY, process.env.RPC_URL);
 
 const INTERVAL_MS = 1000; // Try every 1 second
 
 async function attemptRedeemWithLogging() {
-  const botAddress = account.address;
+  const botAddress = clients.account.address;
   console.log(`\n[${new Date().toISOString()}] Checking vault for address: ${botAddress}`);
 
-  const result = await attemptRedeem({
-    vault: VAULT as Address,
-    owner: OWNER as Address,
+  const result = await attemptRedeem(clients, {
+    vault: DEFAULT_VAULT as Address,
+    owner: DEFAULT_OWNER as Address,
   });
 
   if (result.sharesToRedeem > 0n) {
     console.log(`\n🎯 Found ${result.sharesToRedeem.toString()} shares to redeem!`);
-    console.log(`Attempting to redeem to recipient: ${OWNER}`);
+    console.log(`Attempting to redeem to recipient: ${DEFAULT_OWNER}`);
 
     if (result.success && result.transactionHash) {
       console.log(`✅ Transaction sent! Hash: ${result.transactionHash}`);
@@ -40,9 +52,9 @@ async function attemptRedeemWithLogging() {
 
 async function main() {
   console.log('🚀 Auto-redeem rescue script starting...');
-  console.log(`Vault: ${VAULT}`);
-  console.log(`Recipient: ${OWNER}`);
-  console.log(`Operator: ${account.address}`);
+  console.log(`Vault: ${DEFAULT_VAULT}`);
+  console.log(`Recipient: ${DEFAULT_OWNER}`);
+  console.log(`Operator: ${clients.account.address}`);
   console.log(`Check interval: ${INTERVAL_MS}ms\n`);
 
   // Run immediately

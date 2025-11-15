@@ -1,4 +1,6 @@
+import type prompts from 'prompts';
 import type { Address } from '../types';
+import type { BlockchainClients } from '../core/client-factory';
 
 export enum ModeId {
   VaultRedeem = 'vault-redeem',
@@ -26,6 +28,7 @@ export type Mode = {
   id: ModeId;
   name: string;
   description: string;
-  run: (config: ModeConfig) => Promise<void>;
+  getPrompts: (defaults: any) => prompts.PromptObject[];
+  run: (clients: BlockchainClients, config: ModeConfig) => Promise<void>;
 };
 

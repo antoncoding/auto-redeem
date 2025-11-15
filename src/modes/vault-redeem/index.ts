@@ -1,9 +1,11 @@
 import ora from 'ora';
 import chalk from 'chalk';
 import { attemptRedeem, getOperatorAddress } from './executor';
+import { getVaultRedeemPrompts } from './prompts';
 import { ModeId, type Mode, type ModeConfig, type VaultRedeemConfig } from '../types';
+import type { BlockchainClients } from '../../core/client-factory';
 
-async function runVaultRedeem(config: VaultRedeemConfig) {
+export async function runVaultRedeem(clients: BlockchainClients, config: VaultRedeemConfig) {
   const { vault, owner, interval, delegate } = config;
 
   console.log(chalk.cyan('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
@@ -11,7 +13,7 @@ async function runVaultRedeem(config: VaultRedeemConfig) {
   console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
   console.log(chalk.gray('  Vault:      ') + chalk.white(vault));
   console.log(chalk.gray('  Recipient:  ') + chalk.white(owner));
-  console.log(chalk.gray('  Operator:   ') + chalk.white(getOperatorAddress()));
+  console.log(chalk.gray('  Operator:   ') + chalk.white(getOperatorAddress(clients)));
   console.log(chalk.gray('  Delegate:   ') + (delegate ? chalk.green('✓ Enabled') : chalk.dim('✗ Disabled')));
   console.log(chalk.gray('  Interval:   ') + chalk.white(`${interval}ms`));
   console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
@@ -23,7 +25,7 @@ async function runVaultRedeem(config: VaultRedeemConfig) {
     attemptCount++;
 
     try {
-      const result = await attemptRedeem({ vault, owner, delegate });
+      const result = await attemptRedeem(clients, { vault, owner, delegate });
 
       if (result.sharesToRedeem > 0n) {
         if (spinner) {
@@ -68,10 +70,11 @@ export const vaultRedeemMode: Mode = {
   id: ModeId.VaultRedeem,
   name: 'ERC-4626 Vault Redeem',
   description: 'Continuously redeem shares from ERC-4626 vaults',
-  run: async (config: ModeConfig) => {
+  getPrompts: getVaultRedeemPrompts,
+  run: async (clients, config) => {
     if (config.mode !== ModeId.VaultRedeem) {
       throw new Error('Invalid config for vault-redeem mode');
     }
-    await runVaultRedeem(config);
+    await runVaultRedeem(clients, config);
   },
 };

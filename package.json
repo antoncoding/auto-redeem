@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx src/cli.ts",
-    "start:vault-redeem": "tsx src/cli.ts --mode vault-redeem",
-    "start:morpho-market-withdraw": "tsx src/cli.ts --mode morpho-market-withdraw",
+    "start:vault-redeem": "tsx src/modes/vault-redeem/script.ts",
+    "start:morpho-market-withdraw": "tsx src/modes/auto-withdraw/script.ts",
     "start:legacy": "tsx src/legacy.ts",
     "dev": "tsx watch src/cli.ts",
-    "dev:vault-redeem": "tsx watch src/cli.ts --mode vault-redeem",
-    "dev:morpho-market-withdraw": "tsx watch src/cli.ts --mode morpho-market-withdraw",
+    "dev:vault-redeem": "tsx watch src/modes/vault-redeem/script.ts",
+    "dev:morpho-market-withdraw": "tsx watch src/modes/auto-withdraw/script.ts",
     "dev:legacy": "tsx watch src/legacy.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

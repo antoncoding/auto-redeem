@@ -1,10 +1,14 @@
-import { publicClient, walletClient, account } from '../../core/client';
 import { abi } from './abi';
 import type { Address } from '../../types';
+import type { BlockchainClients } from '../../core/client-factory';
 import type { RedeemResult, AttemptRedeemParams } from './types';
 
-export async function attemptRedeem(params: AttemptRedeemParams): Promise<RedeemResult> {
+export async function attemptRedeem(
+  clients: BlockchainClients,
+  params: AttemptRedeemParams
+): Promise<RedeemResult> {
   const { vault, owner, delegate = false } = params;
+  const { publicClient, walletClient, account } = clients;
 
   try {
     const botAddress = account.address;
@@ -60,6 +64,6 @@ export async function attemptRedeem(params: AttemptRedeemParams): Promise<Redeem
   }
 }
 
-export function getOperatorAddress(): Address {
-  return account.address;
+export function getOperatorAddress(clients: BlockchainClients): Address {
+  return clients.account.address;
 }
