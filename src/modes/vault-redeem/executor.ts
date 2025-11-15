@@ -104,6 +104,8 @@ export async function attemptRedeem(
       return {
         success: receipt.status === 'success',
         sharesToRedeem,
+        currentBalance: balance,
+        maxRedeemable,
         transactionHash: hash,
       };
     }
@@ -111,11 +113,15 @@ export async function attemptRedeem(
     return {
       success: false,
       sharesToRedeem: 0n,
+      currentBalance: balance,
+      maxRedeemable,
     };
   } catch (error) {
     return {
       success: false,
       sharesToRedeem: 0n,
+      currentBalance: 0n,
+      maxRedeemable: 0n,
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
