@@ -14,11 +14,10 @@ if (!DEFAULT_OWNER) {
   process.exit(1);
 }
 
-const clients = createClients(process.env.PRIVATE_KEY, process.env.RPC_URL);
-
 const INTERVAL_MS = 1000; // Try every 1 second
 
 async function attemptRedeemWithLogging() {
+  const clients = await createClients(process.env.PRIVATE_KEY as string, process.env.RPC_URL as string);
   const botAddress = clients.account.address;
   console.log(`\n[${new Date().toISOString()}] Checking vault for address: ${botAddress}`);
 
@@ -37,20 +36,15 @@ async function attemptRedeemWithLogging() {
       console.log(`✅ Transaction confirmed!`);
     } else {
       console.log(`❌ Transaction failed!`);
-      if (result.error) {
-        console.error(`Error: ${result.error}`);
-      }
     }
   } else {
     console.log('No shares available to redeem at this time.');
   }
-
-  if (result.error) {
-    console.error('Error during redeem attempt:', result.error);
-  }
 }
 
 async function main() {
+  const clients = await createClients(process.env.PRIVATE_KEY!, process.env.RPC_URL!);
+
   console.log('🚀 Auto-redeem rescue script starting...');
   console.log(`Vault: ${DEFAULT_VAULT}`);
   console.log(`Recipient: ${DEFAULT_OWNER}`);

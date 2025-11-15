@@ -28,27 +28,24 @@ async function main() {
         process.exit(1);
       }
 
-      const clients = createClients(privateKey, rpcUrl);
-
-      // Get chain ID and determine Morpho address
-      const chainId = await clients.publicClient.getChainId();
+      const clients = await createClients(privateKey, rpcUrl);
       let morphoAddress: Address;
 
       if (options.morpho) {
         morphoAddress = options.morpho as Address;
         console.log(chalk.cyan(`Using provided Morpho address: ${morphoAddress}`));
       } else {
-        const detectedAddress = getMorphoAddress(chainId);
+        const detectedAddress = getMorphoAddress(clients.chain.id);
         if (!detectedAddress) {
           console.error(
             chalk.red(
-              `\n✗ Unknown chain ID: ${chainId}. Please provide Morpho address with --morpho flag\n`
+              `\n✗ Unknown chain: ${clients.chain.name} (${clients.chain.id}). Please provide Morpho address with --morpho flag\n`
             )
           );
           process.exit(1);
         }
         morphoAddress = detectedAddress;
-        console.log(chalk.cyan(`Auto-detected Morpho address for chain ${chainId}: ${morphoAddress}`));
+        console.log(chalk.cyan(`Auto-detected Morpho address for ${clients.chain.name}: ${morphoAddress}`));
       }
 
       await runMorphoMarketWithdraw(clients, {

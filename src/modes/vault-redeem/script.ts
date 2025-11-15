@@ -32,7 +32,7 @@ async function main() {
         process.exit(1);
       }
 
-      const clients = createClients(privateKey, rpcUrl);
+      const clients = await createClients(privateKey, rpcUrl);
 
       await runVaultRedeem(clients, {
         mode: ModeId.VaultRedeem,

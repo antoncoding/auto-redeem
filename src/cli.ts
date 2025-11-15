@@ -54,7 +54,7 @@ async function main() {
   }
 
   // Create blockchain clients
-  const clients = createClients(blockchainAnswers.privateKey, blockchainAnswers.rpcUrl);
+  const clients = await createClients(blockchainAnswers.privateKey, blockchainAnswers.rpcUrl);
 
   // Mode-specific configuration
   console.log(chalk.cyan(`\n⚙️  ${mode.name} Configuration`));
@@ -84,16 +84,15 @@ async function main() {
     if (modeAnswers.morphoAddress) {
       morphoAddress = modeAnswers.morphoAddress as Address;
     } else {
-      const chainId = await clients.publicClient.getChainId();
-      const detectedAddress = getMorphoAddress(chainId);
+      const detectedAddress = getMorphoAddress(clients.chain.id);
       if (!detectedAddress) {
         console.error(
-          chalk.red(`\n✗ Unknown chain ID: ${chainId}. Cannot auto-detect Morpho address.\n`)
+          chalk.red(`\n✗ Unknown chain: ${clients.chain.name} (${clients.chain.id}). Cannot auto-detect Morpho address.\n`)
         );
         process.exit(1);
       }
       morphoAddress = detectedAddress;
-      console.log(chalk.cyan(`Auto-detected Morpho Blue: ${morphoAddress}\n`));
+      console.log(chalk.cyan(`Auto-detected Morpho Blue for ${clients.chain.name}: ${morphoAddress}\n`));
     }
 
     config = {

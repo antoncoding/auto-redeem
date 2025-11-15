@@ -142,8 +142,8 @@ export async function attemptWithdraw(
     let assetsToWithdraw = 0n;
 
     if (availableLiquidity > 0n) {
-      if (availableLiquidity >= supplyAssets) {
-        // Enough liquidity to withdraw everything - use shares for max precision
+      if (availableLiquidity > supplyAssets) {
+        // Enough liquidity to withdraw everything - use shares for max amount
         sharesToWithdraw = position.supplyShares;
       } else {
         // Partial withdrawal - use exact assets amount
