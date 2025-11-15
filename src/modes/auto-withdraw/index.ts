@@ -38,7 +38,8 @@ export async function runMorphoMarketWithdraw(
         log.warn(`⚠️  No ETH for gas. Send ETH to: ${botAddress}`);
         warned.add('eth');
       } else if (preCheck.error === PreCheckError.NotAuthorized && !warned.has('auth')) {
-        log.warn(`⚠️  Not authorized. Owner must call setAuthorization for: ${botAddress}`);
+        log.warn(`⚠️  Not authorized. Authorize bot at: https://www.monarchlend.xyz/tools`);
+        log.warn(`   Bot address: ${botAddress}`);
         warned.add('auth');
       }
       log.status('Waiting for setup...');
@@ -57,8 +58,9 @@ export async function runMorphoMarketWithdraw(
     });
 
     if (result.assetsToWithdraw > 0n && result.transactionHash) {
-      log.success(`💰 Withdrew ${result.assetsToWithdraw} assets → ${owner.slice(0, 10)}...`);
-      log.info(`   TX: ${result.transactionHash}`);
+      const explorerUrl = `${clients.chain.blockExplorers?.default.url}/tx/${result.transactionHash}`;
+      console.log(chalk.green(`\n💰 Withdrew ${result.assetsToWithdraw} assets → ${owner.slice(0, 10)}...`));
+      console.log(chalk.dim(`   ${explorerUrl}\n`));
     }
 
     if (result.currentSupplyShares > 0n) {

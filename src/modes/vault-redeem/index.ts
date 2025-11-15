@@ -46,8 +46,9 @@ export async function runVaultRedeem(clients: BlockchainClients, config: VaultRe
     const result = await attemptRedeem(clients, { vault, owner, delegate });
 
     if (result.sharesToRedeem > 0n && result.transactionHash) {
-      log.success(`💰 Redeemed ${result.sharesToRedeem} shares → ${owner.slice(0, 10)}...`);
-      log.info(`   TX: ${result.transactionHash}`);
+      const explorerUrl = `${clients.chain.blockExplorers?.default.url}/tx/${result.transactionHash}`;
+      console.log(chalk.green(`\n💰 Redeemed ${result.sharesToRedeem} shares → ${owner.slice(0, 10)}...`));
+      console.log(chalk.dim(`   ${explorerUrl}\n`));
     }
 
     if (result.currentBalance > 0n) {

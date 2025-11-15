@@ -10,14 +10,14 @@ A flexible rescue bot that continuously attempts to withdraw funds from DeFi pro
 
 **Always create a fresh, one-time wallet to run this bot. Never use your main wallet's private key.**
 
-**How to do this safely:**
-1. Generate a new wallet at [vanity-eth.tk](https://vanity-eth.tk/) or using any wallet generator
-2. Transfer to this bot wallet:
-   - The vault shares or positions you want to rescue
-   - A small amount of native token (ETH) for gas fees
-3. When running the bot, set your main wallet as the `OWNER` - this is where rescued assets will be sent
+**Setup:**
+1. Generate a new wallet (bot wallet)
+2. Send ETH to bot wallet for gas fees
+3. **For Morpho Markets**: Authorize bot at https://www.monarchlend.xyz/tools
+4. **For ERC4626 Vaults**: Transfer shares to bot OR approve bot (delegate mode)
+5. Set your main wallet as `OWNER` - rescued assets go here
 
-This way, even if something goes wrong, only the bot wallet is at risk, not your main funds.
+This way, only the bot wallet is at risk, not your main funds.
 
 ## Quick Start
 
