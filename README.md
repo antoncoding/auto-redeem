@@ -91,42 +91,51 @@ Operator: 0x66ae9d415DCD4DaD9425B485Bd82D8c2A2F829F9
 
 ### Interactive CLI Mode (Recommended)
 
-Start the bot with the new interactive CLI:
+Start the bot and select your rescue mode:
 
 ```bash
 pnpm start
 ```
 
 The CLI will:
-- Prompt you for configuration if not provided via flags
-- Display a beautiful status dashboard
-- Show real-time progress with spinners
-- Provide colored output for better visibility
+1. **Prompt you to select a rescue mode** (ERC-4626 Vault Redeem, Morpho, etc.)
+2. **Guide you through configuration** for the selected mode
+3. **Display a beautiful status dashboard**
+4. **Show real-time progress** with spinners and colored output
 
-**CLI Options:**
+### Quick Start with Specific Mode
+
 ```bash
-# Run with interactive prompts (default)
-pnpm start
+# ERC-4626 Vault Redeem mode
+pnpm start:vault-redeem
 
-# Run with CLI flags (skip prompts)
-pnpm start --delegate --interval 2000
+# Morpho mode
+pnpm start:morpho
+```
 
-# Run with custom vault and owner
-pnpm start --vault 0xYourVault --owner 0xYourAddress
+### Advanced CLI Usage
+
+**Run with CLI flags (skip prompts):**
+```bash
+# Vault redeem with all params
+pnpm start --mode vault-redeem --vault 0xYourVault --owner 0xYourAddress --delegate --interval 2000
+
+# Morpho with params
+pnpm start --mode morpho --market-id YOUR_MARKET_ID --owner 0xYourAddress
 
 # Skip all interactive prompts
-pnpm start --no-interactive
-
-# Show help
-pnpm start --help
+pnpm start --mode vault-redeem --vault 0xABC... --owner 0xDEF... --no-interactive
 ```
 
 **Available flags:**
-- `-d, --delegate` - Enable delegate mode
-- `-i, --interval <ms>` - Check interval in milliseconds (default: 1000)
-- `-v, --vault <address>` - Vault contract address
+- `-m, --mode <mode>` - Rescue mode: `vault-redeem`, `morpho`
+- `-v, --vault <address>` - Vault contract address (vault-redeem mode)
 - `-o, --owner <address>` - Owner address for receiving assets
+- `--market-id <id>` - Market ID (morpho mode)
+- `-d, --delegate` - Enable delegate mode (vault-redeem mode)
+- `-i, --interval <ms>` - Check interval in milliseconds (default: 1000)
 - `--no-interactive` - Skip interactive prompts
+- `--help` - Show help
 
 ### Legacy Simple Mode
 
@@ -146,23 +155,55 @@ The legacy script:
 
 ## Project Structure
 
-The project is now organized following CLI tool best practices:
+The project uses a **modular, mode-based architecture** for easy extensibility:
 
 ```
 auto-redeem/
 ├── src/
-│   ├── core/              # Shared business logic
-│   │   ├── client.ts      # Blockchain clients
-│   │   ├── constants.ts   # Configuration constants
-│   │   ├── abi.ts         # Contract ABI
-│   │   └── redeem.ts      # Core redemption logic
-│   ├── types/             # TypeScript types
-│   │   └── index.ts       # Shared types
-│   ├── cli.ts             # New interactive CLI (pnpm start)
-│   └── legacy.ts          # Simple script (pnpm start:legacy)
-├── .env                   # Environment variables
+│   ├── core/                      # Shared infrastructure
+│   │   ├── client.ts              # Blockchain clients
+│   │   └── constants.ts           # Global constants
+│   ├── modes/                     # Rescue mode implementations
+│   │   ├── index.ts               # Mode registry
+│   │   ├── types.ts               # Base mode types
+│   │   ├── vault-redeem/          # ERC-4626 vault rescue
+│   │   │   ├── index.ts           # Mode definition
+│   │   │   ├── executor.ts        # Core logic
+│   │   │   ├── abi.ts             # Contract ABI
+│   │   │   └── types.ts           # Mode-specific types
+│   │   └── morpho/                # Morpho market rescue
+│   │       ├── index.ts           # Mode definition
+│   │       ├── executor.ts        # Core logic (TODO)
+│   │       └── types.ts           # Mode-specific types
+│   ├── types/                     # Shared TypeScript types
+│   │   └── index.ts
+│   ├── cli.ts                     # Main CLI with mode selection
+│   └── legacy.ts                  # Legacy simple script
+├── .env                           # Environment variables
 ├── package.json
 └── README.md
+```
+
+### Adding New Rescue Modes
+
+To add a new rescue mode:
+
+1. **Create a new directory** under `src/modes/your-mode/`
+2. **Implement the mode definition** following the `ModeDefinition` interface
+3. **Register the mode** in `src/modes/index.ts`
+4. **Add script alias** to `package.json`
+
+Example mode structure:
+```typescript
+// src/modes/your-mode/index.ts
+export const yourMode: ModeDefinition = {
+  id: 'your-mode',
+  name: 'Your Mode Name',
+  description: 'What this mode does',
+  getPrompts: (options) => [/* prompts */],
+  validateConfig: (config) => [/* validation */],
+  run: async (config) => {/* implementation */},
+};
 ```
 
 ## Changing Networks

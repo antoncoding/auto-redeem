@@ -1,12 +1,7 @@
-import { publicClient, walletClient, account } from './client';
+import { publicClient, walletClient, account } from '../../core/client';
 import { abi } from './abi';
-import type { Address, RedeemResult } from '../types';
-
-export type AttemptRedeemParams = {
-  vault: Address;
-  owner: Address;
-  delegate?: boolean;
-};
+import type { Address } from '../../types';
+import type { RedeemResult, AttemptRedeemParams } from './types';
 
 export async function attemptRedeem(params: AttemptRedeemParams): Promise<RedeemResult> {
   const { vault, owner, delegate = false } = params;

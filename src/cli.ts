@@ -2,197 +2,133 @@
 import 'dotenv/config';
 import { Command } from 'commander';
 import prompts from 'prompts';
-import ora from 'ora';
 import chalk from 'chalk';
-import { account } from './core/client';
-import { VAULT, OWNER } from './core/constants';
-import { attemptRedeem, getOperatorAddress } from './core/redeem';
-import type { Address, RedeemConfig } from './types';
+import { modes, getAllModes, type ModeConfig } from './modes';
 
 const program = new Command();
 
 type CliOptions = {
-  delegate?: boolean;
-  interval?: string;
+  mode?: string;
   vault?: string;
   owner?: string;
+  marketId?: string;
+  delegate?: boolean;
+  interval?: string;
   noInteractive?: boolean;
 };
 
-async function runBot(config: RedeemConfig) {
-  const { vault, owner, interval, delegate } = config;
+async function main() {
+  program
+    .name('auto-redeem')
+    .description('Multi-mode rescue bot for DeFi protocols')
+    .version('2.0.0')
+    .option('-m, --mode <mode>', 'Rescue mode: vault-redeem, morpho')
+    .option('-v, --vault <address>', 'Vault contract address (for vault-redeem mode)')
+    .option('-o, --owner <address>', 'Owner address for receiving redeemed assets')
+    .option('--market-id <id>', 'Market ID (for morpho mode)')
+    .option('-d, --delegate', 'Enable delegate mode (for vault-redeem mode)', false)
+    .option('-i, --interval <ms>', 'Check interval in milliseconds', '1000')
+    .option('--no-interactive', 'Skip interactive prompts')
+    .action(async (options: CliOptions) => {
+      try {
+        let modeId = options.mode;
 
-  console.log(chalk.cyan('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
-  console.log(chalk.bold.cyan('  Auto-Redeem Rescue Bot'));
-  console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
-  console.log(chalk.gray('  Vault:      ') + chalk.white(vault));
-  console.log(chalk.gray('  Recipient:  ') + chalk.white(owner));
-  console.log(chalk.gray('  Operator:   ') + chalk.white(getOperatorAddress()));
-  console.log(chalk.gray('  Delegate:   ') + (delegate ? chalk.green('✓ Enabled') : chalk.dim('✗ Disabled')));
-  console.log(chalk.gray('  Interval:   ') + chalk.white(`${interval}ms`));
-  console.log(chalk.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
+        // If no mode specified and interactive, prompt for mode selection
+        if (!modeId && !options.noInteractive) {
+          const availableModes = getAllModes();
 
-  let attemptCount = 0;
-  let spinner: ora.Ora | null = null;
-
-  async function attempt() {
-    attemptCount++;
-
-    try {
-      const result = await attemptRedeem({
-        vault: vault as Address,
-        owner: owner as Address,
-        delegate,
-      });
-
-      if (result.sharesToRedeem > 0n) {
-        // Stop the persistent spinner if it exists
-        if (spinner) {
-          spinner.stop();
-          spinner = null;
-        }
-
-        const successSpinner = ora(chalk.green(`Found redeemable shares: ${chalk.bold(result.sharesToRedeem.toString())} tokens`)).succeed();
-
-        const txSpinner = ora(chalk.blue('Submitting redemption transaction...')).start();
-
-        if (result.success && result.transactionHash) {
-          txSpinner.succeed(chalk.green(`Transaction confirmed: ${chalk.dim(result.transactionHash)}`));
-          console.log(chalk.green.bold(`💰 Redeemed ${result.sharesToRedeem.toString()} tokens → sent to ${owner.slice(0, 10)}...`));
-        } else {
-          txSpinner.fail(chalk.red('Transaction failed!'));
-          if (result.error) {
-            console.log(chalk.red(`Error: ${result.error}`));
-          }
-        }
-
-        // Restart the persistent spinner
-        spinner = ora(chalk.blue(`Watching vault... (attempt #${attemptCount + 1})`)).start();
-      } else {
-        // Update the existing spinner or create a new one
-        if (!spinner) {
-          spinner = ora(chalk.blue(`Watching vault... (attempt #${attemptCount})`)).start();
-        } else {
-          spinner.text = chalk.blue(`Watching vault... (attempt #${attemptCount})`);
-        }
-      }
-    } catch (error) {
-      if (spinner) {
-        spinner.fail(chalk.red('Error during redeem attempt'));
-        console.error(chalk.red(error instanceof Error ? error.message : 'Unknown error'));
-        // Restart spinner after error
-        spinner = ora(chalk.blue(`Watching vault... (attempt #${attemptCount + 1})`)).start();
-      }
-    }
-  }
-
-  // Run immediately
-  await attempt();
-
-  // Then run at intervals
-  setInterval(attempt, interval);
-}
-
-program
-  .name('auto-redeem')
-  .description('Continuously attempts to withdraw funds from ERC-4626 vaults')
-  .version('2.0.0')
-  .option('-d, --delegate', 'Enable delegate mode', false)
-  .option('-i, --interval <ms>', 'Check interval in milliseconds', '1000')
-  .option('-v, --vault <address>', 'Vault contract address')
-  .option('-o, --owner <address>', 'Owner address for receiving redeemed assets')
-  .option('--no-interactive', 'Skip interactive prompts and use defaults/flags only')
-  .action(async (options: CliOptions) => {
-    try {
-      let vault = options.vault ?? VAULT;
-      let owner = options.owner ?? OWNER;
-      let delegate = options.delegate ?? false;
-      let interval = parseInt(options.interval ?? '1000', 10);
-
-      // Interactive prompts if not disabled
-      if (options.noInteractive !== true) {
-        const questions: prompts.PromptObject[] = [];
-
-        // Only prompt for missing values
-        if (!options.vault && !vault) {
-          questions.push({
-            type: 'text',
-            name: 'vault',
-            message: 'Vault contract address:',
-            initial: VAULT,
+          const { selectedMode } = await prompts({
+            type: 'select',
+            name: 'selectedMode',
+            message: 'Select rescue mode:',
+            choices: availableModes.map(mode => ({
+              title: mode.name,
+              description: mode.description,
+              value: mode.id,
+            })),
           });
-        }
-
-        if (!options.owner && !owner) {
-          questions.push({
-            type: 'text',
-            name: 'owner',
-            message: 'Owner address (recipient):',
-            initial: OWNER,
-          });
-        }
-
-        if (!options.delegate) {
-          questions.push({
-            type: 'confirm',
-            name: 'delegate',
-            message: 'Enable delegate mode?',
-            initial: false,
-          });
-        }
-
-        if (!options.interval || options.interval === '1000') {
-          questions.push({
-            type: 'number',
-            name: 'interval',
-            message: 'Check interval (ms):',
-            initial: 1000,
-            min: 100,
-          });
-        }
-
-        if (questions.length > 0) {
-          const answers = await prompts(questions);
 
           // Handle Ctrl+C
-          if (Object.keys(answers).length === 0) {
+          if (!selectedMode) {
             console.log(chalk.yellow('\nOperation cancelled'));
             process.exit(0);
           }
 
-          vault = answers.vault ?? vault;
-          owner = answers.owner ?? owner;
-          delegate = answers.delegate ?? delegate;
-          interval = answers.interval ?? interval;
+          modeId = selectedMode;
         }
-      }
 
-      // Validation
-      if (!vault) {
-        console.error(chalk.red('Error: Vault address is required'));
+        // Default to vault-redeem if still no mode
+        if (!modeId) {
+          modeId = 'vault-redeem';
+        }
+
+        const mode = modes[modeId];
+
+        if (!mode) {
+          console.error(chalk.red(`\n✗ Unknown mode: ${modeId}\n`));
+          console.log(chalk.dim('Available modes:'));
+          getAllModes().forEach(m => {
+            console.log(chalk.dim(`  - ${m.id}: ${m.description}`));
+          });
+          process.exit(1);
+        }
+
+        // Build initial config from CLI options
+        const initialConfig: Partial<ModeConfig> = {
+          mode: modeId as any,
+          interval: parseInt(options.interval ?? '1000', 10),
+        };
+
+        // Add mode-specific options
+        if (modeId === 'vault-redeem') {
+          if (options.vault) initialConfig.vault = options.vault as any;
+          if (options.owner) initialConfig.owner = options.owner as any;
+          if (options.delegate !== undefined) initialConfig.delegate = options.delegate;
+        } else if (modeId === 'morpho') {
+          if (options.marketId) initialConfig.marketId = options.marketId;
+          if (options.owner) initialConfig.owner = options.owner as any;
+        }
+
+        // Get prompts for missing values
+        let finalConfig = { ...initialConfig };
+
+        if (!options.noInteractive) {
+          const questions = mode.getPrompts(initialConfig);
+
+          if (questions.length > 0) {
+            const answers = await prompts(questions);
+
+            // Handle Ctrl+C
+            if (Object.keys(answers).length === 0 && questions.length > 0) {
+              console.log(chalk.yellow('\nOperation cancelled'));
+              process.exit(0);
+            }
+
+            finalConfig = { ...finalConfig, ...answers };
+          }
+        }
+
+        // Validate configuration
+        const errors = mode.validateConfig(finalConfig);
+
+        if (errors.length > 0) {
+          console.log(chalk.red('\n✗ Configuration Error\n'));
+          errors.forEach(error => {
+            console.log(chalk.red(`  ✗ ${error}`));
+          });
+          console.log();
+          process.exit(1);
+        }
+
+        // Run the mode
+        await mode.run(finalConfig as ModeConfig);
+      } catch (error) {
+        console.error(chalk.red('\n✗ Fatal error:'), error);
         process.exit(1);
       }
+    });
 
-      if (!owner) {
-        console.error(chalk.red('Error: Owner address is required'));
-        process.exit(1);
-      }
+  program.parse();
+}
 
-      if (interval < 100) {
-        console.error(chalk.red('Error: Interval must be at least 100ms'));
-        process.exit(1);
-      }
-
-      await runBot({
-        vault: vault as Address,
-        owner: owner as Address,
-        interval,
-        delegate,
-      });
-    } catch (error) {
-      console.error(chalk.red('Fatal error:'), error);
-      process.exit(1);
-    }
-  });
-
-program.parse();
+main();

@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { account } from './core/client';
 import { VAULT, OWNER } from './core/constants';
-import { attemptRedeem } from './core/redeem';
+import { attemptRedeem } from './modes/vault-redeem/executor';
 import type { Address } from './types';
 
 const INTERVAL_MS = 1000; // Try every 1 second

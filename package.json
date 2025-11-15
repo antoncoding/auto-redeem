@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "tsx src/cli.ts",
+    "start:vault-redeem": "tsx src/cli.ts --mode vault-redeem",
+    "start:morpho": "tsx src/cli.ts --mode morpho",
     "start:legacy": "tsx src/legacy.ts",
     "dev": "tsx watch src/cli.ts",
+    "dev:vault-redeem": "tsx watch src/cli.ts --mode vault-redeem",
+    "dev:morpho": "tsx watch src/cli.ts --mode morpho",
     "dev:legacy": "tsx watch src/legacy.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
