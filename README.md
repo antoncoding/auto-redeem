@@ -19,6 +19,19 @@ A flexible rescue bot that continuously attempts to withdraw funds from DeFi pro
 
 This way, only the bot wallet is at risk, not your main funds.
 
+## Prerequisites
+
+- **Node.js** (v20 or higher) - [Download from nodejs.org](https://nodejs.org/)
+- **pnpm** - Install with `npm install -g pnpm`
+- **RPC URL** - Get free RPC from [Alchemy](https://dashboard.alchemy.com/) or [Chainstack](https://chainstack.com/)
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/antoncoding/auto-redeem.git
+cd auto-redeem
+```
+
 ## Quick Start
 
 ### 1. Install dependencies
@@ -34,6 +47,16 @@ pnpm start
 ```
 
 That's it! The interactive CLI will guide you through everything.
+
+### 3. Gather Required Information
+
+Before starting, you'll need:
+- **Bot wallet private key** - Generate a one-time wallet at [vanity-eth.tk](https://vanity-eth.tk/)
+- **RPC URL** - Get free RPC from [Alchemy](https://dashboard.alchemy.com/) or [Chainstack](https://chainstack.com/)
+- **Vault/Market address** - The contract address where your funds are stuck
+- **Owner address** - Your main wallet where rescued funds should go
+
+📖 **[See detailed setup guide](./docs/setup-guide.md)** for step-by-step instructions on getting each of these.
 
 ## How It Works
 
